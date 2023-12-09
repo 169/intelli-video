@@ -16,12 +16,12 @@ def format_timestamp(seconds: float,):
 
 
 def write_srt(transcript: [dict], audio: str):
-    srt_filename = f"{audio.removesuffix('mp3')}.srt"
+    srt_filename = f"{audio.removesuffix('.mp3')}.srt"
 
     with open(srt_filename, "w") as f:
         for i, segment in enumerate(transcript, start=1):
             start = format_timestamp(segment['start'])
-            end = format_timestamp(segment['start'])
+            end = format_timestamp(segment['end'])
             f.write(f"{i}\n{start} --> {end}\n{segment['text'].strip().replace('-->', '->')}\n")
 
     return srt_filename
