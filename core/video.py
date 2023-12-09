@@ -3,7 +3,8 @@ from pathlib import Path
 
 from config import FFMPEG_BIN, FFMPEG_OPTS, OUTPUT_DIR, FORCE_STYLE
 
-def generate_video(video: str|Path, srt: str) -> str:
+
+def generate_video(video: str|Path, srt: list[str]) -> str:
     if not isinstance(video, Path):
         video = Path(video)
 
