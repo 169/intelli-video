@@ -9,8 +9,15 @@ readme = "README.md"
 python = "^3.11"
 yt-dlp = "^2023.11.16"
 pydantic = "^2.5.2"
-
+click = {version = "^8.1.7"}
+ruff = "^0.1.7"
+mypy = "^1.7.1"
+openai-whisper = {git = "https://github.com/169/whisper.git", rev = "marker"}
+loguru = "^0.7.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+ignore_missing_imports = true

@@ -1,3 +1,5 @@
 openai-whisper==20231117
 yt-dlp==2023.11.16
 pydantic==2.5.2
+click==8.1.7
+loguru==0.7.2
