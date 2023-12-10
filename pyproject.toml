@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "video-translation"
+version = "0.1.0"
+description = ""
+authors = ["Bob Lin <bob401710@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+yt-dlp = "^2023.11.16"
+pydantic = "^2.5.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

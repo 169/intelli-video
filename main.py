@@ -13,8 +13,9 @@ def cli():
 def local(path):
     audio = generate_audio(path)
     srts = generate_srt(audio)
-    video = generate_video(path, srts)
-    click.echo(f'Generated: {video}')
+    for video in generate_video(path, srts):
+        click.echo(f'Generated: {video}')
+
 
 
 @cli.command()
@@ -22,8 +23,8 @@ def local(path):
 def web(url):
     media = download(url)
     srts = generate_srt(media.audio)
-    video = generate_video(media.video, srts)
-    click.echo(f'Generated: {video}')
+    for video in generate_video(media.video, srts):
+        click.echo(f'Generated: {video}')
 
 
 if __name__ == '__main__':

@@ -3,14 +3,13 @@ import warnings
 from pathlib import Path
 
 import whisper
-from whisper.tokenizer import LANGUAGES, TO_LANGUAGE_CODE
 
 from config import WHISPER_MODEL_NAME, DOWNLOAD_DIR, FFMPEG_BIN, FFMPEG_OPTS
 from core.utils import write_srt
 
 model = whisper.load_model(WHISPER_MODEL_NAME)
 
-def generate_srt(audio: str) -> list[str]:
+def generate_srt(audio: str) -> list[str, str]:
     warnings.filterwarnings("ignore")
     result = model.transcribe(audio)
     source_language = result['language']
@@ -19,9 +18,9 @@ def generate_srt(audio: str) -> list[str]:
     else:
         dist_language = 'en'
 
-    srts = [write_srt(result["segments"], audio, source_language)]
+    srts = [write_srt(result["segments"], audio, source_language), source_language]
     result = model.transcribe(audio, language=dist_language)
-    srts.append(write_srt(result["segments"], audio, dist_language))
+    srts.append(write_srt(result["segments"], audio, dist_language), dist_language)
     warnings.filterwarnings("default")
     return srts
 
