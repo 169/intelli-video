@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "video-translation"
+name = "vt"
 version = "0.1.0"
 description = ""
 authors = ["Bob Lin <bob401710@gmail.com>"]
@@ -15,9 +15,12 @@ mypy = "^1.7.1"
 openai-whisper = {git = "https://github.com/169/whisper.git", rev = "marker"}
 loguru = "^0.7.2"
 
+[tool.mypy]
+ignore_missing_imports = true
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.mypy]
-ignore_missing_imports = true
+[tool.poetry.scripts]
+vt = "main:cli"

@@ -5,7 +5,7 @@ from pathlib import Path
 import whisper
 from loguru import logger
 
-from config import DOWNLOAD_DIR, FFMPEG_BIN, FFMPEG_OPTS, WHISPER_MODEL_NAME
+from config import DOWNLOAD_DIR, FFMPEG_BIN, FFMPEG_PREFIX_OPTS, WHISPER_MODEL_NAME
 from core.utils import write_srt
 
 model = whisper.load_model(WHISPER_MODEL_NAME)
@@ -36,7 +36,7 @@ def generate_audio(video: str | Path, suffix=".mp3") -> str:
     audio = f"{DOWNLOAD_DIR}/{video.parts[-1].removesuffix(video.suffix)}{suffix}"
 
     subprocess.check_call(
-        f"{FFMPEG_BIN} {FFMPEG_OPTS} -i '{video.as_posix()}' -b:a 192K -vn '{audio}'",
+        f"{FFMPEG_BIN} {FFMPEG_PREFIX_OPTS} -i '{video.as_posix()}' -b:a 192K -vn '{audio}'",
         shell=True,
     )
     logger.info(f"Audio generated: {audio}")
