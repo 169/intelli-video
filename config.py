@@ -1,5 +1,6 @@
 from pathlib import Path
 
+DEBUG = False
 HERE = Path(__file__).parent.absolute()
 DOWNLOAD_DIR = HERE / ".download"
 OUTPUT_DIR = HERE / "output"
@@ -13,6 +14,6 @@ ZH_FORCE_STYLE = "Fontname=Yuanti SC,PrimaryColour=&H00FFFFFF,OutlineColour=&H00
 EN_FORCE_STYLE = "Fontname=Playpen Sans,PrimaryColour=&H00FFFFFF,OutlineColour=&H00504eff,BorderStyle=3,Fontsize=20"
 
 try:
-    from local_settings import *
+    from local_settings import *  # noqa: F403
 except ImportError:
     ...

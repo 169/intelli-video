@@ -7,10 +7,8 @@ from core.video import generate_video
 
 @click.group()
 def cli():
-    """List the content of one or more directories.
+    """`vt` is a tool for adding subtitle to videos and generating videos in other languages."""
 
-        PATHS is one or more directory paths whose content will be listed.
-        """
 
 @cli.command()
 @click.option("--path", required=True, help="Local file path.")

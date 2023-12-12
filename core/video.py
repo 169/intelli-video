@@ -4,7 +4,15 @@ from typing import Generator
 
 from loguru import logger
 
-from config import EN_FORCE_STYLE, FFMPEG_BIN, FFMPEG_PREFIX_OPTS, FFMPEG_FORMAT_OPTS, OUTPUT_DIR, ZH_FORCE_STYLE
+from config import (
+    DEBUG,
+    EN_FORCE_STYLE,
+    FFMPEG_BIN,
+    FFMPEG_FORMAT_OPTS,
+    FFMPEG_PREFIX_OPTS,
+    OUTPUT_DIR,
+    ZH_FORCE_STYLE,
+)
 
 
 def generate_video(video: str | Path, srts: list[list[str]]) -> Generator:
@@ -20,7 +28,8 @@ def generate_video(video: str | Path, srts: list[list[str]]) -> Generator:
         logger.info(f"Transcoding: {output}")
         style = EN_FORCE_STYLE if language == "en" else ZH_FORCE_STYLE
         cmd = f"""{FFMPEG_BIN} {FFMPEG_PREFIX_OPTS} -i '{video.as_posix()}' {FFMPEG_FORMAT_OPTS} -vf "subtitles='{srt}':fontsdir=./src/fonts/:force_style='{style}'" '{output}'"""
-        logger.debug(f"CMD: {cmd}")
+        if DEBUG:
+            logger.debug(f"CMD: {cmd}")
         subprocess.check_call(cmd, shell=True)
         logger.info(f"Video generated: {output}")
         yield output

@@ -1,8 +1,6 @@
 ## video-translation
 
-It uses [OpenAI Whisper](https://github.com/openai/whisper) and OpenAI API([TTS](https://platform.openai.com/docs/guides/text-to-speech)) to achieve the following purposes:
-
-video-translation is an ongoing project. Its purpose is as follows:
+video-translation is an ongoing project. it uses [OpenAI Whisper](https://github.com/openai/whisper) and OpenAI API([TTS](https://platform.openai.com/docs/guides/text-to-speech)) to achieve the following purposes:
 
 1. Video download. ✅
 2. Get audio from video, the default is mp3 format. ✅
@@ -55,5 +53,18 @@ poetry run python main.py web --url=https://www.youtube.com/watch?v=CqRrByI-ONE
 
 ```bash
 poetry run vt local --path='/Users/169/Movies/test.mov
+```
+
+### Custom config
+
+All configuration items are in [config.py](https://github.com/169/video-translation/blob/main/config.py)
+
+Projects also support limited custom configuration. You can add a file called `local_settings.py` under the project and add the settings you want to override.
+
+for example. The default `debug` is False in `config.py`. You can add `debug = True` in `local_settings.py`, which will enable debug mode:
+
+```bash
+cat local_settings.py
+debug = True
 ```
 
