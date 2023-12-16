@@ -14,7 +14,7 @@ from config import (
 )
 
 
-def generate_video(video: str | Path, srts: list[list[str]]) -> Generator:
+def generate_video(video: str | Path, vtts: list[list[str]]) -> Generator:
     if not isinstance(video, Path):
         video = Path(video)
 
@@ -22,11 +22,11 @@ def generate_video(video: str | Path, srts: list[list[str]]) -> Generator:
     if suffix == ".webm":
         suffix = ".mp4"
 
-    for srt, language in srts:
+    for vtt, language in vtts:
         output = f"{OUTPUT_DIR}/{video.parts[-1].removesuffix(video.suffix)}.{language}{suffix}"
         logger.info(f"Transcoding: {output}")
         style = STYLE_MAP.get(language, STYLE_MAP["en"])
-        cmd = f"""{FFMPEG_BIN} {FFMPEG_PREFIX_OPTS} -i '{video.as_posix()}' {FFMPEG_FORMAT_OPTS} -vf "subtitles='{srt}':fontsdir=./src/fonts/:force_style='{style}'" '{output}'"""
+        cmd = f"""{FFMPEG_BIN} {FFMPEG_PREFIX_OPTS} -i '{video.as_posix()}' {FFMPEG_FORMAT_OPTS} -vf "subtitles='{vtt}':fontsdir=./src/fonts/:force_style='{style}'" '{output}'"""
         if DEBUG:
             logger.debug(f"CMD: {cmd}")
         subprocess.check_call(cmd, shell=True)

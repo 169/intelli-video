@@ -16,32 +16,33 @@ def format_timestamp(
     seconds = milliseconds // 1_000
     milliseconds -= seconds * 1_000
 
-    hours_marker = f"{hours:02d}:"
-    return f"{hours_marker}{minutes:02d}:{seconds:02d},{milliseconds:03d}"
+    return f"{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
 
 
-def write_srt(transcript: list[dict], audio: str, language: str) -> str:
-    srt_filename = f"{audio.removesuffix('.mp3')}.{language}.srt"
+def write_vtt(transcript: list[dict], audio: str, language: str) -> str:
+    srt_filename = f"{audio.removesuffix('.mp3')}.{language}.vtt"
 
     with open(srt_filename, "w") as f:
-        for i, segment in enumerate(transcript, start=1):
+        f.write("WEBVTT\n\n")
+        for segment in transcript:
             start = format_timestamp(segment["start"])
             end = format_timestamp(segment["end"])
-            f.write(f"{i}\n{start} --> {end}\n{segment['text'].strip()}\n")
+            f.write(f"{start} --> {end}\n{segment['text'].strip()}\n")
 
     return srt_filename
 
 
-def write_bilingual_srt(transcript: list[dict], audio: str) -> str:
-    srt_filename = f"{audio.removesuffix('.mp3')}.bilingual.srt"
+def write_bilingual_vtt(transcript: list[dict], audio: str) -> str:
+    srt_filename = f"{audio.removesuffix('.mp3')}.bilingual.vtt"
 
     with open(srt_filename, "w") as f:
-        for i, segment in enumerate(transcript, start=1):
+        f.write("WEBVTT\n")
+        for segment in transcript:
             start = format_timestamp(segment["start"])
             end = format_timestamp(segment["end"])
             title = segment["title"].strip()
             subtitle = segment["subtitle"].strip()
-            f.write(f"{i}\n{start} --> {end}\n{title}\n{subtitle}\n")
+            f.write(f"\n{start} --> {end}\n{title}\n{subtitle}\n")
 
     return srt_filename
 

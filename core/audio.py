@@ -8,13 +8,13 @@ from loguru import logger
 from config import DOWNLOAD_DIR, FFMPEG_BIN, FFMPEG_PREFIX_OPTS, WHISPER_MODEL
 from core.client import translate
 from core.prompts import render_translate_prompt
-from core.utils import batched, write_bilingual_srt, write_srt
+from core.utils import batched, write_bilingual_vtt, write_vtt
 
 model = whisper.load_model(WHISPER_MODEL)
 LIMIT = 30
 
 
-def generate_srt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
+def generate_vtt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
     warnings.filterwarnings("ignore")
     result = model.transcribe(audio)
     source_language = result["language"]
@@ -25,17 +25,17 @@ def generate_srt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
         subtitles = subtitles.split(",")
         if source_language in subtitles:
             srts.append(
-                [write_srt(result["segments"], audio, source_language), source_language]
+                [write_vtt(result["segments"], audio, source_language), source_language]
             )
-            logger.info(f"Generate {source_language} srt: {srts[0][0]}")
+            logger.info(f"Generate {source_language} vtt: {srts[0][0]}")
 
         for dist_language in subtitles:
             if dist_language != source_language:
                 result = model.transcribe(audio, language=dist_language)
                 srts.append(
-                    [write_srt(result["segments"], audio, dist_language), dist_language]
+                    [write_vtt(result["segments"], audio, dist_language), dist_language]
                 )
-                logger.info(f"Generate {dist_language} srt: {srts[-1][0]}")
+                logger.info(f"Generate {dist_language} vtt: {srts[-1][0]}")
     if bilingual:
         title_language, subtitle_language = bilingual.split(",")
         if source_language in (title_language, subtitle_language):
@@ -61,9 +61,9 @@ def generate_srt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
                             seg["subtitle"] = text
                         segments.append(seg)
                 srts.append(
-                    [write_bilingual_srt(segments, audio), "bilingual"],
+                    [write_bilingual_vtt(segments, audio), "bilingual"],
                 )
-                logger.info(f"Generate {bilingual} bilingual srt: {srts[0][0]}")
+                logger.info(f"Generate {bilingual} bilingual vtt: {srts[0][0]}")
         else:
             # TODO: support other languages
             ...

@@ -1,3 +1,4 @@
+from typing import Generator
 from openai import OpenAI
 
 from config import OPENAI_API_KEY, OPENAI_MODEL
@@ -5,7 +6,7 @@ from config import OPENAI_API_KEY, OPENAI_MODEL
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 
-def translate(prompt) -> list[str]:
+def translate(prompt) -> Generator:
     chat_completion = client.chat.completions.create(
         messages=[
             {
@@ -15,4 +16,6 @@ def translate(prompt) -> list[str]:
         ],
         model=OPENAI_MODEL,
     )
-    return chat_completion.choices[0].message.content.split("\n")
+    for text in chat_completion.choices[0].message.content.split("\n"):
+        if text:
+            yield text

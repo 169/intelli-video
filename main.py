@@ -1,6 +1,6 @@
 import click
 
-from core.audio import generate_audio, generate_srt
+from core.audio import generate_audio, generate_vtt
 from core.downloader import download
 from core.video import generate_video
 
@@ -68,8 +68,8 @@ def local(path, bilingual, subtitles):
             "Illegal usage: `--bilingual` requires 2 language subtitles, you can use `cn,en` or `en,cn`"
         )
     audio = generate_audio(path)
-    srts = generate_srt(audio, bilingual, subtitles)
-    for video in generate_video(path, srts):
+    vtts = generate_vtt(audio, bilingual, subtitles)
+    for video in generate_video(path, vtts):
         click.echo(f"Generated: {video}")
 
 
@@ -97,8 +97,8 @@ def web(url, bilingual, subtitles):
             "Illegal usage: `--bilingual` requires 2 language subtitles, you can use `cn,en` or `en,cn`"
         )
     media = download(url)
-    srts = generate_srt(media.audio, bilingual, subtitles)
-    for video in generate_video(media.video, srts):
+    vtts = generate_vtt(media.audio, bilingual, subtitles)
+    for video in generate_video(media.video, vtts):
         click.echo(f"Generated: {video}")
 
 
