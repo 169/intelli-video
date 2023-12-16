@@ -3,6 +3,7 @@ import click
 from core.audio import generate_audio, generate_vtt
 from core.downloader import download
 from core.video import generate_video
+from config import OUTPUT_DIR
 
 
 class Mutex(click.Option):
@@ -46,6 +47,7 @@ def cli():
 
 @cli.command()
 @click.option("-p", "--path", required=True, help="Local file path.")
+@click.option("-o", "--output", default=OUTPUT_DIR, help="Generated video dir.")
 @click.option(
     "-b",
     "--bilingual",
@@ -62,19 +64,20 @@ def cli():
     not_required_if=["bilingual"],
     help='Subtitle languages. split by ","',
 )
-def local(path, bilingual, subtitles):
+def local(path, output, bilingual, subtitles):
     if bilingual and "," not in bilingual:
         raise click.UsageError(
             "Illegal usage: `--bilingual` requires 2 language subtitles, you can use `cn,en` or `en,cn`"
         )
     audio = generate_audio(path)
     vtts = generate_vtt(audio, bilingual, subtitles)
-    for video in generate_video(path, vtts):
+    for video in generate_video(path, vtts, output):
         click.echo(f"Generated: {video}")
 
 
 @cli.command()
-@click.option("-u", "--url", required=True, help="video url.")
+@click.option("-u", "--url", required=True, help="Video url.")
+@click.option("-o", "--output", default=OUTPUT_DIR, help="Generated video dir.")
 @click.option(
     "-b",
     "--bilingual",
@@ -91,14 +94,14 @@ def local(path, bilingual, subtitles):
     not_required_if=["bilingual"],
     help='Subtitle languages. split by ","',
 )
-def web(url, bilingual, subtitles):
+def web(url, output, bilingual, subtitles):
     if bilingual and "," not in bilingual:
         raise click.UsageError(
             "Illegal usage: `--bilingual` requires 2 language subtitles, you can use `cn,en` or `en,cn`"
         )
     media = download(url)
     vtts = generate_vtt(media.audio, bilingual, subtitles)
-    for video in generate_video(media.video, vtts):
+    for video in generate_video(media.video, vtts, output):
         click.echo(f"Generated: {video}")
 
 

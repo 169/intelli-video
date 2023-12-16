@@ -10,11 +10,10 @@ from config import (
     FFMPEG_BIN,
     FFMPEG_FORMAT_OPTS,
     FFMPEG_PREFIX_OPTS,
-    OUTPUT_DIR,
 )
 
 
-def generate_video(video: str | Path, vtts: list[list[str]]) -> Generator:
+def generate_video(video: str | Path, vtts: list[list[str]], output_dir: str) -> Generator:
     if not isinstance(video, Path):
         video = Path(video)
 
@@ -23,7 +22,7 @@ def generate_video(video: str | Path, vtts: list[list[str]]) -> Generator:
         suffix = ".mp4"
 
     for vtt, language in vtts:
-        output = f"{OUTPUT_DIR}/{video.parts[-1].removesuffix(video.suffix)}.{language}{suffix}"
+        output = f"{output_dir}/{video.parts[-1].removesuffix(video.suffix)}.{language}{suffix}"
         logger.info(f"Transcoding: {output}")
         style = STYLE_MAP.get(language, STYLE_MAP["en"])
         cmd = f"""{FFMPEG_BIN} {FFMPEG_PREFIX_OPTS} -i '{video.as_posix()}' {FFMPEG_FORMAT_OPTS} -vf "subtitles='{vtt}':fontsdir=./src/fonts/:force_style='{style}'" '{output}'"""
