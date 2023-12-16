@@ -6,12 +6,11 @@ from loguru import logger
 
 from config import (
     DEBUG,
-    EN_FORCE_STYLE,
+    STYLE_MAP,
     FFMPEG_BIN,
     FFMPEG_FORMAT_OPTS,
     FFMPEG_PREFIX_OPTS,
     OUTPUT_DIR,
-    ZH_FORCE_STYLE,
 )
 
 
@@ -26,7 +25,7 @@ def generate_video(video: str | Path, srts: list[list[str]]) -> Generator:
     for srt, language in srts:
         output = f"{OUTPUT_DIR}/{video.parts[-1].removesuffix(video.suffix)}.{language}{suffix}"
         logger.info(f"Transcoding: {output}")
-        style = EN_FORCE_STYLE if language == "en" else ZH_FORCE_STYLE
+        style = STYLE_MAP.get(language, STYLE_MAP["en"])
         cmd = f"""{FFMPEG_BIN} {FFMPEG_PREFIX_OPTS} -i '{video.as_posix()}' {FFMPEG_FORMAT_OPTS} -vf "subtitles='{srt}':fontsdir=./src/fonts/:force_style='{style}'" '{output}'"""
         if DEBUG:
             logger.debug(f"CMD: {cmd}")

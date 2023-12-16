@@ -1,3 +1,6 @@
+from itertools import islice
+
+
 def format_timestamp(
     seconds: float,
 ):
@@ -24,8 +27,29 @@ def write_srt(transcript: list[dict], audio: str, language: str) -> str:
         for i, segment in enumerate(transcript, start=1):
             start = format_timestamp(segment["start"])
             end = format_timestamp(segment["end"])
-            f.write(
-                f"{i}\n{start} --> {end}\n{segment['text'].strip().replace('-->', '->')}\n"
-            )
+            f.write(f"{i}\n{start} --> {end}\n{segment['text'].strip()}\n")
 
     return srt_filename
+
+
+def write_bilingual_srt(transcript: list[dict], audio: str) -> str:
+    srt_filename = f"{audio.removesuffix('.mp3')}.bilingual.srt"
+
+    with open(srt_filename, "w") as f:
+        for i, segment in enumerate(transcript, start=1):
+            start = format_timestamp(segment["start"])
+            end = format_timestamp(segment["end"])
+            title = segment["title"].strip()
+            subtitle = segment["subtitle"].strip()
+            f.write(f"{i}\n{start} --> {end}\n{title}\n{subtitle}\n")
+
+    return srt_filename
+
+
+def batched(iterable, n):
+    # batched('ABCDEFG', 3) --> ABC DEF G
+    if n < 1:
+        raise ValueError("n must be at least one")
+    it = iter(iterable)
+    while batch := tuple(islice(it, n)):
+        yield batch

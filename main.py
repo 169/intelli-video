@@ -92,6 +92,10 @@ def local(path, bilingual, subtitles):
     help='Subtitle languages. split by ","',
 )
 def web(url, bilingual, subtitles):
+    if bilingual and "," not in bilingual:
+        raise click.UsageError(
+            "Illegal usage: `--bilingual` requires 2 language subtitles, you can use `cn,en` or `en,cn`"
+        )
     media = download(url)
     srts = generate_srt(media.audio, bilingual, subtitles)
     for video in generate_video(media.video, srts):
