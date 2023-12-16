@@ -49,10 +49,17 @@ def generate_vtt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
                     lst = list(lst)
                     content = "\n".join(seg["text"] for seg in lst)
                     new_texts = translate(render_translate_prompt(content, other_language))
-                    text_map = {k.strip(): v for k, v in batched(new_texts, 2)}
+                    text_map = {}
+                    for item in batched(new_texts, 2):
+                        try:
+                            k, v = item
+                        except ValueError:
+                            logger.error(f"Error: unpack fail:{item}")
+                            continue
+                        text_map[k.strip()] = v
                     for index, seg in enumerate(lst):
                         text = seg["text"]
-                        trans = text_map.get(text.strip())
+                        trans = text_map.get(text.strip(), "")
                         if title_language == "en":
                             seg["title"] = f"<strong>{text}</strong>"
                             seg["subtitle"] = trans
