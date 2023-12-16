@@ -5,13 +5,13 @@ from pathlib import Path
 import whisper
 from loguru import logger
 
-from config import DOWNLOAD_DIR, FFMPEG_BIN, FFMPEG_PREFIX_OPTS, WHISPER_MODEL_NAME
+from config import DOWNLOAD_DIR, FFMPEG_BIN, FFMPEG_PREFIX_OPTS, WHISPER_MODEL
 from core.utils import write_srt
 
-model = whisper.load_model(WHISPER_MODEL_NAME)
+model = whisper.load_model(WHISPER_MODEL)
 
 
-def generate_srt(audio: str) -> list[list[str]]:
+def generate_srt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
     warnings.filterwarnings("ignore")
     result = model.transcribe(audio)
     source_language = result["language"]
@@ -20,12 +20,23 @@ def generate_srt(audio: str) -> list[list[str]]:
     else:
         dist_language = "en"
 
-    srts = [[write_srt(result["segments"], audio, source_language), source_language]]
-    logger.info(f"Generate {source_language} srt: {srts[0][0]}")
-    result = model.transcribe(audio, language=dist_language)
-    srts.append([write_srt(result["segments"], audio, dist_language), dist_language])
+    srts = []
+
+    if subtitles:
+        if source_language in subtitles:
+            srts.append(
+                [write_srt(result["segments"], audio, source_language), source_language]
+            )
+            logger.info(f"Generate {source_language} srt: {srts[0][0]}")
+        if dist_language in subtitles:
+            result = model.transcribe(audio, language=dist_language)
+            srts.append(
+                [write_srt(result["segments"], audio, dist_language), dist_language]
+            )
+            logger.info(f"Generate {dist_language} srt: {srts[1][0]}")
+    if bilingual:
+        ...
     warnings.filterwarnings("default")
-    logger.info(f"Generate {dist_language} srt: {srts[1][0]}")
     return srts
 
 

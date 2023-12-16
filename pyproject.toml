@@ -14,6 +14,7 @@ ruff = "^0.1.7"
 mypy = "^1.7.1"
 openai-whisper = {git = "https://github.com/169/whisper.git", rev = "marker"}
 loguru = "^0.7.2"
+streamlit = "^1.29.0"
 
 [tool.mypy]
 ignore_missing_imports = true
