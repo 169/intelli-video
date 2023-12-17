@@ -6,14 +6,16 @@ from loguru import logger
 
 from config import (
     DEBUG,
-    STYLE_MAP,
     FFMPEG_BIN,
     FFMPEG_FORMAT_OPTS,
     FFMPEG_PREFIX_OPTS,
+    STYLE_MAP,
 )
 
 
-def generate_video(video: str | Path, vtts: list[list[str]], output_dir: str) -> Generator:
+def generate_video(
+    video: str | Path, vtts: list[list[str]], output_dir: str
+) -> Generator:
     if not isinstance(video, Path):
         video = Path(video)
 

@@ -1,9 +1,9 @@
 import click
 
+from config import OUTPUT_DIR
 from core.audio import generate_audio, generate_vtt
 from core.downloader import download
 from core.video import generate_video
-from config import OUTPUT_DIR
 
 
 class Mutex(click.Option):

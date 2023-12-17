@@ -6,18 +6,51 @@ import whisper
 from loguru import logger
 
 from config import DOWNLOAD_DIR, FFMPEG_BIN, FFMPEG_PREFIX_OPTS, WHISPER_MODEL
-from core.client import translate
+from core.client import Client
 from core.prompts import render_translate_prompt
-from core.utils import batched, write_bilingual_vtt, write_vtt
+from core.utils import (
+    batched,
+    check_fallback_to_openai,
+    parse_vtt,
+    write_bilingual_vtt,
+    write_vtt,
+)
 
 model = whisper.load_model(WHISPER_MODEL)
-LIMIT = 30
+LIMIT = 20
+
+
+def generate_vtt_from_api(
+    audio: str, title_language: str, other_language: str
+) -> list[list[str]]:
+    client = Client()
+    transcript = client.transcribe(audio)
+    all_segments = [i.model_dump() for i in parse_vtt(transcript)]
+    segments = []
+    for lst in batched(all_segments, LIMIT):
+        texts = [seg["text"] for seg in lst]
+        content = "\n".join(texts)
+        text_map = client.translate(render_translate_prompt(content, other_language))
+        print(text_map, "text_map")
+        for seg in lst:
+            text = seg["text"]
+            trans = text_map.get(text.strip(), "")
+            if title_language == "en":
+                seg["title"] = f"<strong>{text}</strong>"
+                seg["subtitle"] = trans
+            else:
+                seg["title"] = f"<strong>{trans}</strong>"
+                seg["subtitle"] = text
+            segments.append(seg)
+    return [[write_bilingual_vtt(segments, audio), "bilingual"]]
 
 
 def generate_vtt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
     warnings.filterwarnings("ignore")
     result = model.transcribe(audio)
     source_language = result["language"]
+
+    client = Client()
 
     srts = []
 
@@ -47,17 +80,17 @@ def generate_vtt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
                 segments = []
                 for lst in batched(result["segments"], LIMIT):
                     lst = list(lst)
-                    content = "\n".join(seg["text"] for seg in lst)
-                    new_texts = translate(render_translate_prompt(content, other_language))
-                    text_map = {}
-                    for item in batched(new_texts, 2):
-                        try:
-                            k, v = item
-                        except ValueError:
-                            logger.error(f"Error: unpack fail:{item}")
-                            continue
-                        text_map[k.strip()] = v
-                    for index, seg in enumerate(lst):
+                    texts = [seg["text"] for seg in lst]
+                    content = "\n".join(texts)
+                    text_map = client.translate(
+                        render_translate_prompt(content, other_language)
+                    )
+                    need_use_api = check_fallback_to_openai(text_map, texts)
+                    if need_use_api:
+                        return generate_vtt_from_api(
+                            audio, title_language, other_language
+                        )
+                    for seg in lst:
                         text = seg["text"]
                         trans = text_map.get(text.strip(), "")
                         if title_language == "en":

@@ -1,4 +1,8 @@
 from itertools import islice
+from typing import Generator
+
+from core.schema import Segment
+from config import MISMATCH_LIMIT
 
 
 def format_timestamp(
@@ -38,19 +42,44 @@ def write_bilingual_vtt(transcript: list[dict], audio: str) -> str:
     with open(srt_filename, "w") as f:
         f.write("WEBVTT\n")
         for segment in transcript:
-            start = format_timestamp(segment["start"])
-            end = format_timestamp(segment["end"])
+            if "start" in segment and segment["start"] is not None:
+                start = format_timestamp(segment["start"])
+                end = format_timestamp(segment["end"])
+                timestamp = f"{start} --> {end}"
+            else:
+                timestamp = segment["timestamp"]
             title = segment["title"].strip()
             subtitle = segment["subtitle"].strip()
-            f.write(f"\n{start} --> {end}\n{title}\n{subtitle}\n")
+            f.write(f"\n{timestamp}\n{title}\n{subtitle}\n")
 
     return srt_filename
 
 
-def batched(iterable, n):
+def batched(iterable, n) -> Generator:
     # batched('ABCDEFG', 3) --> ABC DEF G
     if n < 1:
         raise ValueError("n must be at least one")
     it = iter(iterable)
     while batch := tuple(islice(it, n)):
         yield batch
+
+
+def check_fallback_to_openai(text_map: dict, texts: list[str]) -> bool:
+    texts = [text.strip() for text in texts]
+    not_seen = {}
+    for k, v in text_map.copy().items():
+        k = k.strip()
+        if k not in texts:
+            not_seen[k] = v.strip()
+    return len(not_seen) > MISMATCH_LIMIT
+
+
+def parse_vtt(text: str) -> list[Segment]:
+    texts = []
+    for items in batched(text.splitlines()[2:], 3):
+        try:
+            timestamp, text, _ = list(items)
+        except ValueError:
+            timestamp, text = list(items)
+        texts.append(Segment(timestamp=timestamp, text=text))
+    return texts

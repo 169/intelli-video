@@ -16,9 +16,10 @@ EN_FONT_SIZE = 20
 BI_FONT_SIZE = 12
 FONT_COLOR = "&H00FFFFFF"
 OUTLINE_COLOR = "&H00504eff"
+MISMATCH_LIMIT = 5
 
 OPENAI_API_KEY = ""
-OPENAI_MODEL = "gpt-3.5-turbo"
+OPENAI_MODEL = "gpt-3.5-turbo-1106"
 
 # https://wamingo.net/rgbbgr/
 ZH_FORCE_STYLE = f"Fontname={ZH_FONT_NAME},PrimaryColour={FONT_COLOR},OutlineColour={OUTLINE_COLOR},BorderStyle=3,Fontsize={ZH_FONT_SIZE}"

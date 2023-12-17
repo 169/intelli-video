@@ -1,21 +1,34 @@
-from typing import Generator
+import json
+from typing import Literal
+from loguru import logger
 from openai import OpenAI
 
-from config import OPENAI_API_KEY, OPENAI_MODEL
-
-client = OpenAI(api_key=OPENAI_API_KEY)
+from config import DEBUG, OPENAI_API_KEY, OPENAI_MODEL
 
 
-def translate(prompt) -> Generator:
-    chat_completion = client.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
-        model=OPENAI_MODEL,
-    )
-    for text in chat_completion.choices[0].message.content.split("\n"):
-        if text:
-            yield text
+class Client:
+    def __init__(self):
+        self.client = OpenAI(api_key=OPENAI_API_KEY)
+
+    def translate(self, prompt) -> dict:
+        print(prompt)
+        if DEBUG:
+            logger.debug(prompt)
+        chat_completion = self.client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+            model=OPENAI_MODEL,
+            response_format={"type": "json_object"},
+        )
+
+        return json.loads(chat_completion.choices[0].message.content)
+
+    def transcribe(self, audio: str, response_format: Literal["vvt", "srt"] = "vtt") -> str:
+        transcript = self.client.audio.transcriptions.create(
+            model="whisper-1", file=open(audio, "rb"), response_format=response_format
+        )
+        return transcript
