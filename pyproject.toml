@@ -16,6 +16,7 @@ openai-whisper = {git = "https://github.com/169/whisper.git", rev = "marker"}
 loguru = "^0.7.2"
 streamlit = "^1.29.0"
 openai = "^1.4.0"
+tenacity = "^8.2.3"
 
 [tool.mypy]
 ignore_missing_imports = true

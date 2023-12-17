@@ -70,7 +70,11 @@ def check_fallback_to_openai(text_map: dict, texts: list[str]) -> bool:
     for k, v in text_map.copy().items():
         k = k.strip()
         if k not in texts:
-            not_seen[k] = v.strip()
+            try:
+                not_seen[k] = v.strip()
+            except AttributeError:
+                print(f"AttributeError: {k}\t{v}")
+                not_seen[k] = v[0].strip()
     return len(not_seen) > MISMATCH_LIMIT
 
 

@@ -2,6 +2,7 @@ import subprocess
 import warnings
 from pathlib import Path
 
+import openai
 import whisper
 from loguru import logger
 
@@ -94,9 +95,13 @@ def generate_vtt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
                     )
                     need_use_api = check_fallback_to_openai(text_map, texts)
                     if need_use_api:
-                        return generate_vtt_from_api(
-                            audio, title_language, other_language
-                        )
+                        try:
+                            return generate_vtt_from_api(
+                                audio, title_language, other_language
+                            )
+                        except openai.APIStatusError:
+                            ...
+                    text_map = assign_texts(text_map, texts)
                     for seg in lst:
                         text = seg["text"]
                         trans = text_map.get(text.strip(), "")
