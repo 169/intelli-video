@@ -1,5 +1,6 @@
 import json
 from typing import Literal
+
 from loguru import logger
 from openai import OpenAI
 
@@ -11,7 +12,6 @@ class Client:
         self.client = OpenAI(api_key=OPENAI_API_KEY)
 
     def translate(self, prompt) -> dict:
-        print(prompt)
         if DEBUG:
             logger.debug(prompt)
         chat_completion = self.client.chat.completions.create(
@@ -27,7 +27,9 @@ class Client:
 
         return json.loads(chat_completion.choices[0].message.content)
 
-    def transcribe(self, audio: str, response_format: Literal["vvt", "srt"] = "vtt") -> str:
+    def transcribe(
+        self, audio: str, response_format: Literal["vvt", "srt"] = "vtt"
+    ) -> str:
         transcript = self.client.audio.transcriptions.create(
             model="whisper-1", file=open(audio, "rb"), response_format=response_format
         )

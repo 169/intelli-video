@@ -5,10 +5,17 @@ from pathlib import Path
 import whisper
 from loguru import logger
 
-from config import DOWNLOAD_DIR, FFMPEG_BIN, FFMPEG_PREFIX_OPTS, WHISPER_MODEL
+from config import (
+    DOWNLOAD_DIR,
+    FFMPEG_BIN,
+    FFMPEG_PREFIX_OPTS,
+    TEXT_LIMIT,
+    WHISPER_MODEL,
+)
 from core.client import Client
 from core.prompts import render_translate_prompt
 from core.utils import (
+    assign_texts,
     batched,
     check_fallback_to_openai,
     parse_vtt,
@@ -17,21 +24,21 @@ from core.utils import (
 )
 
 model = whisper.load_model(WHISPER_MODEL)
-LIMIT = 20
 
 
 def generate_vtt_from_api(
     audio: str, title_language: str, other_language: str
 ) -> list[list[str]]:
+    logger.info(f"Generate {title_language} vtt from OpenAI API: {audio}")
     client = Client()
     transcript = client.transcribe(audio)
     all_segments = [i.model_dump() for i in parse_vtt(transcript)]
     segments = []
-    for lst in batched(all_segments, LIMIT):
+    for lst in batched(all_segments, TEXT_LIMIT):
         texts = [seg["text"] for seg in lst]
         content = "\n".join(texts)
         text_map = client.translate(render_translate_prompt(content, other_language))
-        print(text_map, "text_map")
+        text_map = assign_texts(text_map, texts)
         for seg in lst:
             text = seg["text"]
             trans = text_map.get(text.strip(), "")
@@ -78,7 +85,7 @@ def generate_vtt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
                     subtitle_language if title_language == "en" else title_language
                 )
                 segments = []
-                for lst in batched(result["segments"], LIMIT):
+                for lst in batched(result["segments"], TEXT_LIMIT):
                     lst = list(lst)
                     texts = [seg["text"] for seg in lst]
                     content = "\n".join(texts)

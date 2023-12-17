@@ -1,8 +1,8 @@
 from itertools import islice
 from typing import Generator
 
+from config import MISMATCH_LIMIT, TEXT_LIMIT
 from core.schema import Segment
-from config import MISMATCH_LIMIT
 
 
 def format_timestamp(
@@ -83,3 +83,16 @@ def parse_vtt(text: str) -> list[Segment]:
             timestamp, text = list(items)
         texts.append(Segment(timestamp=timestamp, text=text))
     return texts
+
+
+def assign_texts(text_map: dict, texts: list[str]) -> dict:
+    for _ in range(TEXT_LIMIT):
+        for i in range(1, len(texts)):
+            new_text = " ".join(texts[:i])
+            if val := text_map.get(new_text):
+                if i != 1:
+                    sep = round(len(val) / i)
+                    for index, text in enumerate(texts[:i]):
+                        text_map[text] = val[index * sep : (index + 1) * sep]
+                texts = texts[i:]
+    return text_map
