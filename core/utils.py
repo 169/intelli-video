@@ -1,3 +1,4 @@
+import re
 from itertools import islice
 from typing import Generator
 
@@ -99,4 +100,15 @@ def assign_texts(text_map: dict, texts: list[str]) -> dict:
                     for index, text in enumerate(texts[:i]):
                         text_map[text] = val[index * sep : (index + 1) * sep]
                 texts = texts[i:]
+    for text in texts:
+        combined_text = ''
+        match = False
+        for sentence in re.split(',|\.|\?', text):
+            sentence = sentence.strip()
+            for term in (sentence, f'{sentence},', f'{sentence}.', f'{sentence}?'):
+                if val := text_map.get(term):
+                    combined_text += f" {val}"
+                    match = True
+        if match:
+            text_map[text] = combined_text
     return text_map

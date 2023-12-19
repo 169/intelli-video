@@ -27,7 +27,7 @@ class Client:
         )
 
         return json.loads(chat_completion.choices[0].message.content)
-    
+
     @retry(stop=stop_after_attempt(3))
     def transcribe(
         self, audio: str, response_format: Literal["vvt", "srt"] = "vtt"

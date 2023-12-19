@@ -3,6 +3,7 @@ import warnings
 from pathlib import Path
 
 import openai
+import tenacity
 import whisper
 from loguru import logger
 
@@ -99,7 +100,7 @@ def generate_vtt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
                             return generate_vtt_from_api(
                                 audio, title_language, other_language
                             )
-                        except openai.APIStatusError:
+                        except (openai.APIStatusError, tenacity.RetryError):
                             ...
                     text_map = assign_texts(text_map, texts)
                     for seg in lst:
