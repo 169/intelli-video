@@ -28,11 +28,11 @@ def write_vtt(transcript: list[dict], audio: str, language: str) -> str:
     srt_filename = f"{audio.removesuffix('.mp3')}.{language}.vtt"
 
     with open(srt_filename, "w") as f:
-        f.write("WEBVTT\n\n")
+        f.write("WEBVTT\n")
         for segment in transcript:
             start = format_timestamp(segment["start"])
             end = format_timestamp(segment["end"])
-            f.write(f"{start} --> {end}\n{segment['text'].strip()}\n")
+            f.write(f"\n{start} --> {end}\n{segment['text'].strip()}\n")
 
     return srt_filename
 
@@ -101,11 +101,11 @@ def assign_texts(text_map: dict, texts: list[str]) -> dict:
                         text_map[text] = val[index * sep : (index + 1) * sep]
                 texts = texts[i:]
     for text in texts:
-        combined_text = ''
+        combined_text = ""
         match = False
-        for sentence in re.split(',|\.|\?', text):
+        for sentence in re.split(",|\.|\?", text):
             sentence = sentence.strip()
-            for term in (sentence, f'{sentence},', f'{sentence}.', f'{sentence}?'):
+            for term in (sentence, f"{sentence},", f"{sentence}.", f"{sentence}?"):
                 if val := text_map.get(term):
                     combined_text += f" {val}"
                     match = True

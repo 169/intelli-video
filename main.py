@@ -1,4 +1,5 @@
 import click
+from loguru import logger
 
 from config import OUTPUT_DIR
 from core.audio import generate_audio, generate_vtt
@@ -59,7 +60,7 @@ def cli():
 @click.option(
     "-s",
     "--subtitles",
-    default="",
+    default="zh,en",
     cls=Mutex,
     not_required_if=["bilingual"],
     help='Subtitle languages. split by ","',
@@ -71,8 +72,10 @@ def local(path, output, bilingual, subtitles):
         )
     audio = generate_audio(path)
     vtts = generate_vtt(audio, bilingual, subtitles)
+    if not vtts:
+        logger.warning("No subtitles generated.")
     for video in generate_video(path, vtts, output):
-        click.echo(f"Generated: {video}")
+        logger.info(f"Generated: {video}")
 
 
 @cli.command()
@@ -89,7 +92,7 @@ def local(path, output, bilingual, subtitles):
 @click.option(
     "-s",
     "--subtitles",
-    default="",
+    default="zh,en",
     cls=Mutex,
     not_required_if=["bilingual"],
     help='Subtitle languages. split by ","',
@@ -101,8 +104,10 @@ def web(url, output, bilingual, subtitles):
         )
     media = download(url)
     vtts = generate_vtt(media.audio, bilingual, subtitles)
+    if not vtts:
+        logger.warning("No subtitles generated.")
     for video in generate_video(media.video, vtts, output):
-        click.echo(f"Generated: {video}")
+        logger.info(f"Generated: {video}")
 
 
 if __name__ == "__main__":

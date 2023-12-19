@@ -28,6 +28,13 @@ from core.utils import (
 model = whisper.load_model(WHISPER_MODEL)
 
 
+def transcribe(audio: str, language: str = "en") -> dict:
+    logger.info(f"Transcribe: {audio} <Language: {language}>")
+    result = model.transcribe(audio, language=language)
+    logger.info(f"Transcribed: {audio} <Language: {language}>")
+    return result
+
+
 def generate_vtt_from_api(
     audio: str, title_language: str, other_language: str
 ) -> list[list[str]]:
@@ -56,7 +63,7 @@ def generate_vtt_from_api(
 
 def generate_vtt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
     warnings.filterwarnings("ignore")
-    result = model.transcribe(audio)
+    result = transcribe(audio)
     source_language = result["language"]
 
     client = Client()
@@ -73,7 +80,7 @@ def generate_vtt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
 
         for dist_language in subtitles:
             if dist_language != source_language:
-                result = model.transcribe(audio, language=dist_language)
+                result = transcribe(audio, language=dist_language)
                 srts.append(
                     [write_vtt(result["segments"], audio, dist_language), dist_language]
                 )
@@ -82,7 +89,7 @@ def generate_vtt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
         title_language, subtitle_language = bilingual.split(",")
         if source_language in (title_language, subtitle_language):
             if "en" in (title_language, subtitle_language):
-                result = model.transcribe(audio, language="en")
+                result = transcribe(audio, language="en")
                 other_language = (
                     subtitle_language if title_language == "en" else title_language
                 )
