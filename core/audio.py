@@ -1,10 +1,12 @@
 import subprocess
 import warnings
+import os
 from pathlib import Path
 
 import openai
 import tenacity
 import whisper
+from whisper.utils import get_writer
 from loguru import logger
 
 from config import (
@@ -29,10 +31,23 @@ model = whisper.load_model(WHISPER_MODEL)
 
 
 def transcribe(audio: str, language: str = "en") -> dict:
+    warnings.filterwarnings("ignore")
     logger.info(f"Transcribe: {audio} <Language: {language}>")
     result = model.transcribe(audio, language=language)
     logger.info(f"Transcribed: {audio} <Language: {language}>")
+    warnings.filterwarnings("default")
     return result
+
+
+def generate_subtitle(audio: str, method: str, language: str, format: str, output_directory: str) -> str:
+    if method == "whisper":
+        result = transcribe(audio, language=language)
+        writer = get_writer(format, output_directory)
+        writer(result, audio)
+
+        srt_filename = f"{output_directory}/{os.path.basename(audio).removesuffix('.mp3')}.{language}.{format}"
+
+        logger.info(f"Subtitle generated: {srt_filename} <Language: {language}>")
 
 
 def generate_vtt_from_api(

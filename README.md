@@ -1,25 +1,24 @@
 ## video-translation
 
-video-translation is an ongoing project. it uses [OpenAI Whisper](https://github.com/openai/whisper) and OpenAI API([TTS](https://platform.openai.com/docs/guides/text-to-speech)) to achieve the following purposes:
+video-translation is an ongoing project leveraging [OpenAI Whisper](https://github.com/openai/whisper) and the OpenAI API ([TTS](https://platform.openai.com/docs/guides/text-to-speech)) to accomplish the following objectives:
 
-1. Video download. ✅
-2. Get audio from video, the default is mp3 format. ✅
-3. Generate subtitles based on audio and translate them into other languages. ✅
-4. Add hard subtitles to videos. ✅
-5. Support the production of videos in other languages based on subtitles. Not yet
+1. Video Download: ✅
+2. Extract Audio from Video: Default format is mp3. ✅
+3. Generate Subtitles from Audio and Translate: ✅
+4. Embed Hard Subtitles into Videos: ✅
+5. Support for Video Production in Different Languages based on Subtitles: In progress
 
-Therefore, `vt` can automatically add subtitles in various languages to online videos and local videos. In the future, the voices in the videos can also be automatically converted into other languages. Welcome to follow this project and contribute code
+Hence, vt autonomously adds subtitles in multiple languages to both online and local videos. Future capabilities aim to automatically convert video voices into various languages. Feel free to follow and contribute to this project.
 
 ## Setup
 
-First, Install and update using `poetry`:
+Begin by installing and updating using poetry:
 
 ```bash
 poetry install
 ```
 
-It also requires the command-line tool ffmpeg to be installed on your system, which is available from most package managers:
-
+Additionally, ensure you have the command-line tool `ffmpeg` installed on your system. It's available via most package managers:
 ```bash
 # on Ubuntu or Debian
 sudo apt update && sudo apt install ffmpeg
@@ -39,7 +38,16 @@ scoop install ffmpeg
 
 ## Command-line usage
 
-Currently 3 methods of adding subtitles are supported.
+There are two primary command-line usage types:
+
+1. **Generate Subtitle Files**: Supports srt, vtt format based on video content. You can use video tools or website functions to add these subtitles to videos.
+2. **Directly Add Subtitles to Videos**: Currently supports three methods of subtitle addition.
+
+### Generate subtitle files(Supports srt, vtt, json, txt, tsv and all format)
+
+```bash
+poetry run vt subtitle --path='https://www.bilibili.com/video/BV1tb4y1L7yA' --language=en --method=whisper --format=vtt --output=/Users/169/Downloads
+```
 
 ### Download video online and add subtitle
 
@@ -69,7 +77,7 @@ Options:
 poetry run vt local --path='/Users/169/Movies/test.mov
 ```
 
-The `web` subcommand also supports more options, as follows:
+The `local` subcommand also supports more options, as follows:
 
 ```bash
 poetry run vt local --help
@@ -88,20 +96,19 @@ Options:
 
 ### Add bilingual subtitles to local video
 
-Use `--bilingual` option to generate bilingual subtitles. The two languages are separated by commas. The first language is on top and the later language is on the bottom.
+Use the `--bilingual` option to create bilingual subtitles. Separate the two languages with commas, with the first language on top and the latter at the bottom.
 
 ```bash
 poetry run vt local --path="/Users/169/videos/Langchain C3_L6.mp4" --bilingual="cn,en" --output="/Users/169/Downloads"
 ```
 
-
 ## Custom config
 
-All configuration items are in [config.py](https://github.com/169/video-translation/blob/main/config.py)
+All configuration items reside in [config.py](https://github.com/169/video-translation/blob/main/config.py).
 
-Projects also support limited custom configuration. You can add a file called `local_settings.py` under the project and add the settings you want to override.
+The project also supports limited custom configuration. Add a file named `local_settings.py` within the project and include the settings you wish to override.
 
-for example. The default `debug` is False in `config.py`. You can add `debug = True` in `local_settings.py`, which will enable debug mode:
+For instance, if the default debug is set to `False` in `config.py`, you can enable debug mode by adding `debug = True` in local_settings.py:
 
 ```bash
 cat local_settings.py

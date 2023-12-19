@@ -2,7 +2,7 @@ import click
 from loguru import logger
 
 from config import OUTPUT_DIR
-from core.audio import generate_audio, generate_vtt
+from core.audio import generate_audio, generate_vtt, generate_subtitle
 from core.downloader import download
 from core.video import generate_video
 
@@ -44,6 +44,33 @@ class Mutex(click.Option):
 @click.group()
 def cli():
     """`vt` is a tool for adding subtitle to videos and generating videos in other languages."""
+
+
+@cli.command()
+@click.option("-p", "--path", required=True, help="Local file path or video url.")
+@click.option("-o", "--output", default=OUTPUT_DIR, help="Generated video dir.")
+@click.option("-l", "--language", default="en", help="Subtitle language.")
+@click.option(
+    "-m",
+    "--method",
+    default="whisper",
+    type=click.Choice(["whisper", "openai_api"], case_sensitive=False),
+    help="Method for generating subtitle files.",
+)
+@click.option(
+    "-f",
+    "--format",
+    default="vtt",
+    type=click.Choice(["vtt", "srt", "json", "txt", "tsv", "all"], case_sensitive=False),
+    help="Subtitle format.",
+)
+def subtitle(path, output, language, method, format):
+    if path.startswith("http"):
+        media = download(path)
+        audio = media.audio
+    else:
+        audio = generate_audio(path)
+    generate_subtitle(audio, method, language, format, output)
 
 
 @cli.command()
