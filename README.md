@@ -39,23 +39,63 @@ scoop install ffmpeg
 
 ## Command-line usage
 
-By default, Chinese and English subtitles will be added to the video.
+Currently 3 methods of adding subtitles are supported.
 
-You can use the following 2 commands:
-
-### Download video online
+### Download video online and add subtitle
 
 ```bash
 poetry run python main.py web --url=https://www.youtube.com/watch?v=CqRrByI-ONE
 ```
 
-### Local video
+The `web` subcommand also supports more options, as follows:
+
+```bash
+poetry run vt web --help
+Usage: vt web [OPTIONS]
+
+Options:
+  -u, --url TEXT        Video url.  [required]
+  -o, --output TEXT     Generated video dir.
+  -b, --bilingual TEXT  Use bilingual subtitle. Notice: this option is mutually exclusive
+                        with subtitles.
+  -s, --subtitles TEXT  Subtitle languages. split by ",". Notice: this option is mutually
+                        exclusive with bilingual.
+  --help                Show this message and exit.
+```
+
+### Use local video and add subtitle
 
 ```bash
 poetry run vt local --path='/Users/169/Movies/test.mov
 ```
 
-### Custom config
+The `web` subcommand also supports more options, as follows:
+
+```bash
+poetry run vt local --help
+Usage: vt local [OPTIONS]
+
+Options:
+  -p, --path TEXT       Local file path.  [required]
+  -o, --output TEXT     Generated video dir.
+  -b, --bilingual TEXT  Use bilingual subtitle. you can specify the subtitle
+                        language by `--subtitles`. Notice: this option is
+                        mutually exclusive with subtitles.
+  -s, --subtitles TEXT  Subtitle languages. split by ",". Notice: this option
+                        is mutually exclusive with bilingual.
+  --help                Show this message and exit.
+```
+
+### Add bilingual subtitles to local video
+
+Use `--bilingual` option to generate bilingual subtitles. The two languages are separated by commas. The first language is on top and the later language is on the bottom.
+
+```bash
+poetry run vt local --path="/Users/169/videos/Langchain C3_L6.mp4" --bilingual="cn,en" --output="/Users/169/Downloads"
+```
+
+
+## Custom config
 
 All configuration items are in [config.py](https://github.com/169/video-translation/blob/main/config.py)
 

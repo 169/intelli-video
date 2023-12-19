@@ -27,13 +27,6 @@ ZH_FORCE_STYLE = f"Fontname={ZH_FONT_NAME},PrimaryColour={FONT_COLOR},OutlineCol
 EN_FORCE_STYLE = f"Fontname={EN_FONT_NAME},PrimaryColour={FONT_COLOR},OutlineColour={OUTLINE_COLOR},BorderStyle=3,Fontsize={EN_FONT_SIZE}"
 BI_FORCE_STYLE = f"Fontname={EN_FONT_NAME},PrimaryColour={FONT_COLOR},OutlineColour={OUTLINE_COLOR},BorderStyle=3,Fontsize={BI_FONT_SIZE}"
 
-
-STYLE_MAP = {
-    "zh": ZH_FORCE_STYLE,
-    "en": EN_FORCE_STYLE,
-    "bilingual": BI_FORCE_STYLE,
-}
-
 try:
     from local_settings import *  # noqa: F403
 except ImportError:

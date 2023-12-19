@@ -5,12 +5,20 @@ from typing import Generator
 from loguru import logger
 
 from config import (
+    BI_FORCE_STYLE,
     DEBUG,
+    EN_FORCE_STYLE,
     FFMPEG_BIN,
     FFMPEG_FORMAT_OPTS,
     FFMPEG_PREFIX_OPTS,
-    STYLE_MAP,
+    ZH_FORCE_STYLE,
 )
+
+STYLE_MAP = {
+    "zh": ZH_FORCE_STYLE,
+    "en": EN_FORCE_STYLE,
+    "bilingual": BI_FORCE_STYLE,
+}
 
 
 def generate_video(

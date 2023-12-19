@@ -14,7 +14,7 @@ class Mutex(click.Option):
         assert self.not_required_if, "'not_required_if' parameter required"
         kwargs["help"] = (
             kwargs.get("help", "")
-            + "Option is mutually exclusive with "
+            + ". Notice: this option is mutually exclusive with "
             + ", ".join(self.not_required_if)
             + "."
         ).strip()
