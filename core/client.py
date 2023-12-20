@@ -30,9 +30,15 @@ class Client:
 
     @retry(stop=stop_after_attempt(3))
     def transcribe(
-        self, audio: str, response_format: Literal["vvt", "srt"] = "vtt"
+        self,
+        audio: str,
+        response_format: Literal["vvt", "srt"] = "vtt",
+        language="en",
     ) -> str:
         transcript = self.client.audio.transcriptions.create(
-            model="whisper-1", file=open(audio, "rb"), response_format=response_format
+            model="whisper-1",
+            language=language,
+            file=open(audio, "rb"),
+            response_format=response_format,
         )
         return transcript

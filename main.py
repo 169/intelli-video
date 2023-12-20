@@ -2,9 +2,12 @@ import click
 from loguru import logger
 
 from config import OUTPUT_DIR
-from core.audio import generate_audio, generate_vtt, generate_subtitle
+from core.audio import generate_audio, generate_subtitle, generate_vtt
 from core.downloader import download
 from core.video import generate_video
+
+WHISPER_SUPPORT_TYPES = ["vtt", "srt", "json", "txt", "tsv", "all"]
+OPENAI_API_SUPPORT_TYPES = ["json", "text", "vtt", "srt"]
 
 
 class Mutex(click.Option):
@@ -61,10 +64,18 @@ def cli():
     "-f",
     "--format",
     default="vtt",
-    type=click.Choice(["vtt", "srt", "json", "txt", "tsv", "all"], case_sensitive=False),
     help="Subtitle format.",
 )
 def subtitle(path, output, language, method, format):
+    if method == "whisper" and format not in WHISPER_SUPPORT_TYPES:
+        raise click.UsageError(
+            f"Illegal usage: `whisper` method only support: {WHISPER_SUPPORT_TYPES}."
+        )
+    elif method == "openai_api" and format not in OPENAI_API_SUPPORT_TYPES:
+        raise click.UsageError(
+            f"Illegal usage: `openai_api` method only support: {OPENAI_API_SUPPORT_TYPES}."
+        )
+
     if path.startswith("http"):
         media = download(path)
         audio = media.audio

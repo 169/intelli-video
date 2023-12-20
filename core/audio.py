@@ -1,13 +1,13 @@
+import os
 import subprocess
 import warnings
-import os
 from pathlib import Path
 
 import openai
 import tenacity
 import whisper
-from whisper.utils import get_writer
 from loguru import logger
+from whisper.utils import get_writer
 
 from config import (
     DOWNLOAD_DIR,
@@ -39,15 +39,21 @@ def transcribe(audio: str, language: str = "en") -> dict:
     return result
 
 
-def generate_subtitle(audio: str, method: str, language: str, format: str, output_directory: str) -> str:
+def generate_subtitle(
+    audio: str, method: str, language: str, format: str, output_directory: str
+) -> str:
     if method == "whisper":
         result = transcribe(audio, language=language)
-        writer = get_writer(format, output_directory)
-        writer(result, audio)
+    elif method == "openai_api":
+        client = Client()
+        result = client.transcribe(audio, response_format=format, language=language)
 
-        srt_filename = f"{output_directory}/{os.path.basename(audio).removesuffix('.mp3')}.{language}.{format}"
+    writer = get_writer(format, output_directory)
+    writer(result, audio)
 
-        logger.info(f"Subtitle generated: {srt_filename} <Language: {language}>")
+    srt_filename = f"{output_directory}/{os.path.basename(audio).removesuffix('.mp3')}.{language}.{format}"
+
+    logger.info(f"Subtitle generated: {srt_filename} <Language: {language}>")
 
 
 def generate_vtt_from_api(
