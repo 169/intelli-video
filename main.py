@@ -1,7 +1,9 @@
 import click
 from loguru import logger
+from whisper import _MODELS
+from whisper.tokenizer import LANGUAGES
 
-from config import OUTPUT_DIR
+from config import OUTPUT_DIR, WHISPER_MODEL
 from core.audio import generate_audio, generate_subtitle, generate_vtt
 from core.downloader import download
 from core.video import generate_video
@@ -52,7 +54,20 @@ def cli():
 @cli.command()
 @click.option("-p", "--path", required=True, help="Local file path or video url.")
 @click.option("-o", "--output", default=OUTPUT_DIR, help="Generated video dir.")
-@click.option("-l", "--language", default="en", help="Subtitle language.")
+@click.option(
+    "-l",
+    "--language",
+    default="en",
+    type=click.Choice(LANGUAGES.keys(), case_sensitive=False),
+    help="Subtitle language.",
+)
+@click.option(
+    "-m",
+    "--model",
+    default=WHISPER_MODEL,
+    type=click.Choice(_MODELS.keys(), case_sensitive=False),
+    help="Whisper model name.",
+)
 @click.option(
     "-m",
     "--method",
@@ -66,7 +81,7 @@ def cli():
     default="vtt",
     help="Subtitle format.",
 )
-def subtitle(path, output, language, method, format):
+def subtitle(path, output, language, model, method, format):
     if method == "whisper" and format not in WHISPER_SUPPORT_TYPES:
         raise click.UsageError(
             f"Illegal usage: `whisper` method only support: {WHISPER_SUPPORT_TYPES}."
@@ -81,7 +96,7 @@ def subtitle(path, output, language, method, format):
         audio = media.audio
     else:
         audio = generate_audio(path)
-    generate_subtitle(audio, method, language, format, output)
+    generate_subtitle(audio, method, language, format, output, model_name=model)
 
 
 @cli.command()

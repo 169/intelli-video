@@ -30,9 +30,13 @@ from core.utils import (
 model = whisper.load_model(WHISPER_MODEL)
 
 
-def transcribe(audio: str, language: str = "en") -> dict:
+def transcribe(
+    audio: str, language: str = "en", model_name: str = WHISPER_MODEL
+) -> dict:
     warnings.filterwarnings("ignore")
     logger.info(f"Transcribe: {audio} <Language: {language}>")
+    if model_name != WHISPER_MODEL:
+        model = whisper.load_model(model_name)
     result = model.transcribe(audio, language=language)
     logger.info(f"Transcribed: {audio} <Language: {language}>")
     warnings.filterwarnings("default")
@@ -40,18 +44,24 @@ def transcribe(audio: str, language: str = "en") -> dict:
 
 
 def generate_subtitle(
-    audio: str, method: str, language: str, format: str, output_directory: str
+    audio: str,
+    method: str,
+    language: str,
+    format: str,
+    output_directory: str,
+    model_name: str,
 ) -> str:
+    srt_filename = f"{output_directory}/{os.path.basename(audio).removesuffix('.mp3')}.{language}.{format}"
+
     if method == "whisper":
-        result = transcribe(audio, language=language)
+        result = transcribe(audio, language=language, model_name=model_name)
+        writer = get_writer(format, output_directory)
+        writer(result, audio)
     elif method == "openai_api":
         client = Client()
-        result = client.transcribe(audio, response_format=format, language=language)
-
-    writer = get_writer(format, output_directory)
-    writer(result, audio)
-
-    srt_filename = f"{output_directory}/{os.path.basename(audio).removesuffix('.mp3')}.{language}.{format}"
+        text = client.transcribe(audio, response_format=format, language=language)
+        with open(srt_filename, "w") as f:
+            f.write(text)
 
     logger.info(f"Subtitle generated: {srt_filename} <Language: {language}>")
 

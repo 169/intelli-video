@@ -3,6 +3,7 @@ from typing import Literal
 
 from loguru import logger
 from openai import OpenAI
+from pydantic import ValidationError
 from tenacity import retry, stop_after_attempt
 
 from config import DEBUG, OPENAI_API_KEY, OPENAI_MODEL
@@ -10,6 +11,10 @@ from config import DEBUG, OPENAI_API_KEY, OPENAI_MODEL
 
 class Client:
     def __init__(self):
+        if not OPENAI_API_KEY:
+            raise ValidationError(
+                "`OPENAI_API_KEY` is required. please add it to `local_settings.py`. "
+            )
         self.client = OpenAI(api_key=OPENAI_API_KEY)
 
     def translate(self, prompt) -> dict:
