@@ -2012,6 +2012,21 @@ watchdog = {version = ">=2.1.5", markers = "platform_system != \"Darwin\""}
 snowflake = ["snowflake-connector-python (>=2.8.0)", "snowflake-snowpark-python (>=0.9.0)"]
 
 [[package]]
+name = "streamlit-component-video"
+version = "0.2.0"
+description = "A new video with track"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "streamlit-component-video-0.2.0.tar.gz", hash = "sha256:f447e00205f4a3204f5a015a299eed667ed50823eec79f8324b45bd7c4b6e954"},
+    {file = "streamlit_component_video-0.2.0-py3-none-any.whl", hash = "sha256:975c2435c6f0de9fe089e3cea723a8efa8d2712cd04f0e6ac6d6bb852e293ed9"},
+]
+
+[package.dependencies]
+jinja2 = "*"
+streamlit = ">=1.2"
+
+[[package]]
 name = "sympy"
 version = "1.12"
 description = "Computer algebra system (CAS) in Python"
@@ -2481,4 +2496,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "a726fd3a955a363b7cb801a5c9ff6dfdb36d19010abbe9f08e118b4578d8518b"
+content-hash = "eb3236403d7556efcbfdcbe85ba269ebe41d4a67fc2b73eba1c42196dcbe7180"

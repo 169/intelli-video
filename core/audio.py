@@ -27,16 +27,13 @@ from core.utils import (
     write_vtt,
 )
 
-model = whisper.load_model(WHISPER_MODEL)
-
 
 def transcribe(
     audio: str, language: str = "en", model_name: str = WHISPER_MODEL
 ) -> dict:
     warnings.filterwarnings("ignore")
     logger.info(f"Transcribe: {audio} <Language: {language}>")
-    if model_name != WHISPER_MODEL:
-        model = whisper.load_model(model_name)
+    model = whisper.load_model(model_name)
     result = model.transcribe(audio, language=language)
     logger.info(f"Transcribed: {audio} <Language: {language}>")
     warnings.filterwarnings("default")
@@ -51,19 +48,23 @@ def generate_subtitle(
     output_directory: str,
     model_name: str,
 ) -> str:
-    srt_filename = f"{output_directory}/{os.path.basename(audio).removesuffix('.mp3')}.{language}.{format}"
-
     if method == "whisper":
+        filename = f"{output_directory}/{os.path.basename(audio).removesuffix('.mp3')}.{format}"
         result = transcribe(audio, language=language, model_name=model_name)
         writer = get_writer(format, output_directory)
         writer(result, audio)
     elif method == "openai_api":
+        filename = f"{output_directory}/{os.path.basename(audio).removesuffix('.mp3')}.{language}.{format}"
         client = Client()
-        text = client.transcribe(audio, response_format=format, language=language)
-        with open(srt_filename, "w") as f:
-            f.write(text)
+        text = client.transcribe(audio, response_format=format, language=language)  # type: ignore[arg-type]
 
-    logger.info(f"Subtitle generated: {srt_filename} <Language: {language}>")
+        with open(filename, "w") as f:
+            f.write(text)
+    else:
+        raise ValueError(f"Unknown method: {method}")
+
+    logger.info(f"Subtitle generated: {filename} <Language: {language}>")
+    return filename
 
 
 def generate_vtt_from_api(
@@ -102,14 +103,14 @@ def generate_vtt(audio: str, bilingual: str, subtitles: str) -> list[list[str]]:
     srts = []
 
     if subtitles:
-        subtitles = subtitles.split(",")
-        if source_language in subtitles:
+        subtitles_ = subtitles.split(",")
+        if source_language in subtitles_:
             srts.append(
                 [write_vtt(result["segments"], audio, source_language), source_language]
             )
             logger.info(f"Generate {source_language} vtt: {srts[0][0]}")
 
-        for dist_language in subtitles:
+        for dist_language in subtitles_:
             if dist_language != source_language:
                 result = transcribe(audio, language=dist_language)
                 srts.append(

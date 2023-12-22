@@ -17,9 +17,12 @@ loguru = "^0.7.2"
 streamlit = "^1.29.0"
 openai = "^1.4.0"
 tenacity = "^8.2.3"
+streamlit-component-video = "^0.2.0"
+watchdog = "^3.0.0"
 
 [tool.mypy]
 ignore_missing_imports = true
+check_untyped_defs = true
 
 [build-system]
 requires = ["poetry-core"]

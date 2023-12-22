@@ -31,19 +31,19 @@ class Client:
             response_format={"type": "json_object"},
         )
 
-        return json.loads(chat_completion.choices[0].message.content)
+        return json.loads(chat_completion.choices[0].message.content)  # type: ignore[arg-type]
 
     @retry(stop=stop_after_attempt(3))
     def transcribe(
         self,
         audio: str,
-        response_format: Literal["vvt", "srt"] = "vtt",
+        response_format: Literal["vvt", "srt"] = Literal["vtt"],  # type: ignore[assignment]
         language="en",
     ) -> str:
         transcript = self.client.audio.transcriptions.create(
             model="whisper-1",
             language=language,
             file=open(audio, "rb"),
-            response_format=response_format,
+            response_format=response_format,  # type: ignore[arg-type]
         )
-        return transcript
+        return transcript  # type: ignore

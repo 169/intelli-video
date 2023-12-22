@@ -14,7 +14,7 @@ OPENAI_API_SUPPORT_TYPES = ["json", "text", "vtt", "srt"]
 
 class Mutex(click.Option):
     def __init__(self, *args, **kwargs):
-        self.not_required_if: list = kwargs.pop("not_required_if")
+        self.not_required_if: list = kwargs.pop("not_required_if", [])
 
         assert self.not_required_if, "'not_required_if' parameter required"
         kwargs["help"] = (

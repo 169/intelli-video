@@ -162,3 +162,4 @@ cython_debug/
 output
 .DS_Store
 local_settings.py
+.env
