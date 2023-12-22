@@ -1,4 +1,5 @@
 import mimetypes
+import os.path
 
 import streamlit as st
 import whisper
@@ -18,10 +19,12 @@ from config import (
 )
 from core.audio import generate_audio, generate_subtitle
 from core.downloader import download
+from core.video import generate_video
 
 if "subtitle_path" not in st.session_state:
     st.session_state.update(
         {
+            "vtt_content": "",
             "subtitle_path": "",
             "video": {
                 "mimetype": "video/mp4",
@@ -87,7 +90,12 @@ with st.sidebar:
     st.write("## Video")
 
 video_path = st.text_input("Video Path or URL")
-subtitle_path = st.text_input("Subtitle Path or URL", value=st.session_state.subtitle_path)
+subtitle_path = st.text_input("VTT Path or URL", value=st.session_state.subtitle_path)
+
+if subtitle_path:
+    with open(subtitle_path) as f:
+        st.session_state.vtt_content = f.read()
+
 
 def subtitle_callback(path: str) -> None:
     if not path:
@@ -107,6 +115,14 @@ def subtitle_callback(path: str) -> None:
         )
 
 
+def save_callback() -> None:
+    if not subtitle_path:
+        st.error("Subtitle is required.")
+    else:
+        with open(subtitle_path, "w") as f:
+            f.write(st.session_state.vtt_content)
+
+
 def preview_callback() -> None:
     track = subtitle_path or st.session_state.subtitle_path
     if not track:
@@ -120,17 +136,41 @@ def preview_callback() -> None:
             track=track,
         )
 
+def generate_callback() -> None:
+    if not video_path:
+        st.error("Video Path or URL is required.")
+    elif not subtitle_path:
+        st.error("Subtitle is required.")
+    else:
+        vtts = [[subtitle_path, language]]
+        for video in generate_video(video_path, vtts, output_dir):
+            st.success(f"Video Generated: {video}")
 
-col1, col2 = st.columns(2)
+
+col1, col2, col3, col4, col5 = st.columns(5)
+
+with col1:
+    st.button("Preview", on_click=preview_callback)
 
 with col2:
     st.button(
-        "Generate Subtitle",
+        "Generate VTT",
         on_click=subtitle_callback,
         args=(video_path,),
     )
-with col1:
-    st.button("Preview", on_click=preview_callback)
+
+with col3:
+    st.button(
+        "Save VTT",
+        on_click=save_callback,
+    )
+with col4:
+    st.download_button(
+        "Download VTT", st.session_state.vtt_content, os.path.basename(subtitle_path)
+    )
+
+with col5:
+    st.button("Generate", on_click=generate_callback)
 
 streamlit_component_video(
     video=st.session_state["video"]["path"],
