@@ -20,11 +20,14 @@ from config import (
 from core.audio import generate_audio, generate_subtitle
 from core.downloader import download
 from core.video import generate_video
+from core.utils import parse_vtt, _write_vtt
 
 if "subtitle_path" not in st.session_state:
     st.session_state.update(
         {
-            "current_time": '',
+            "segments": [],
+            "current_seg_index": 0,
+            "current_time": 0,
             "vtt_content": "",
             "subtitle_path": "",
             "widget_values": {},
@@ -32,6 +35,7 @@ if "subtitle_path" not in st.session_state:
                 "mimetype": "video/mp4",
                 "path": "",
                 "track": "",
+                "current_time": 0,
             },
         }
     )
@@ -44,8 +48,9 @@ def make_recording_widget(f):
         return widget_value
     return wrapper
 
+
 with st.sidebar:
-    st.info("🎈 Configure")
+    st.info("🎈Configure")
 
     st.write("## File")
     mimetype = st.selectbox(
@@ -74,6 +79,9 @@ with st.sidebar:
     )
 
     st.write("## Subtitle")
+
+    subtitle_auto_save = st.checkbox('Audo Save')
+
     language: str = (
         st.selectbox(
             "Language",
@@ -101,10 +109,25 @@ with st.sidebar:
 
 video_path = st.text_input("Video Path or URL")
 subtitle_path = st.text_input("VTT Path or URL", value=st.session_state.subtitle_path)
-
 if subtitle_path:
     with open(subtitle_path) as f:
-        st.session_state.vtt_content = f.read()
+        content = f.read()
+        st.session_state.vtt_content = content
+        if not st.session_state.segments:
+            st.session_state.segments = parse_vtt(content)
+
+
+def get_current_vtt_content() -> str:
+    values = st.session_state["widget_values"]
+    if not values:
+        return ""
+    if not values["video_component"]:
+        return ""
+    current_time = values["video_component"]['current_time']
+    for index, seg in enumerate(st.session_state.segments):
+        if seg.start <= current_time <= seg.end:
+            st.session_state['current_seg_index'] = index
+            return seg.text
 
 
 def subtitle_callback(path: str) -> None:
@@ -129,8 +152,8 @@ def save_callback() -> None:
     if not subtitle_path:
         st.error("Subtitle is required.")
     else:
-        with open(subtitle_path, "w") as f:
-            f.write(st.session_state.vtt_content)
+        _write_vtt(st.session_state.segments, subtitle_path)
+        st.success(f"Subtitle saved")
 
 
 def preview_callback() -> None:
@@ -160,8 +183,6 @@ def generate_callback() -> None:
 
 col1, col2, col3, col4, col5 = st.columns(5)
 
-st.write(st.session_state["current_time"])
-
 with col1:
     st.button("Preview", on_click=preview_callback)
 
@@ -187,10 +208,15 @@ with col5:
 
 make_recording_widget(streamlit_component_video)(
     label="video_component",
-    video=st.session_state["video"]["path"],
+    path=st.session_state["video"]["path"],
     mimetype=st.session_state["video"]["mimetype"],
     track=st.session_state["video"]["track"],
     current_time=st.session_state["current_time"],
 )
 
-st.write(st.session_state["widget_values"])
+current_vtt = st.text_input("Subtitle", value=get_current_vtt_content())
+if st.session_state.segments and current_vtt:
+    st.session_state.segments[st.session_state.current_seg_index].text = current_vtt
+
+if subtitle_auto_save and subtitle_path and st.session_state.segments:
+    _write_vtt(st.session_state.segments, subtitle_path)

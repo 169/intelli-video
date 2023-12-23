@@ -24,17 +24,26 @@ def format_timestamp(
     return f"{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
 
 
-def write_vtt(transcript: list[dict], audio: str, language: str) -> str:
-    srt_filename = f"{audio.removesuffix('.mp3')}.{language}.vtt"
+def write_vtt(transcript: list[dict|Segment], audio: str, language: str | None = None) -> str:
+    if language is not None:
+        vtt_filename = f"{audio.removesuffix('.mp3')}.{language}.vtt"
+    else:
+        vtt_filename = f"{audio.removesuffix('.mp3')}.vtt"
+    return _write_vtt(transcript, vtt_filename)
 
-    with open(srt_filename, "w") as f:
+
+def _write_vtt(transcript: list[dict|Segment], vtt_filename: str) -> str:
+
+    with open(vtt_filename, "w") as f:
         f.write("WEBVTT\n")
         for segment in transcript:
+            if isinstance(segment, Segment):
+                segment = segment.model_dump()
             start = format_timestamp(segment["start"])
             end = format_timestamp(segment["end"])
             f.write(f"\n{start} --> {end}\n{segment['text'].strip()}\n")
 
-    return srt_filename
+    return vtt_filename
 
 
 def write_bilingual_vtt(transcript: list[dict], audio: str) -> str:
@@ -79,6 +88,11 @@ def check_fallback_to_openai(text_map: dict, texts: list[str]) -> bool:
     return len(not_seen) > MISMATCH_LIMIT
 
 
+def get_seconds(time_str: str) -> float:
+    m, s = time_str.strip().split(":")
+    return float(m) * 60 + float(s)
+
+
 def parse_vtt(text: str) -> list[Segment]:
     texts = []
     for items in batched(text.splitlines()[2:], 3):
@@ -87,9 +101,7 @@ def parse_vtt(text: str) -> list[Segment]:
         except ValueError:
             timestamp, text = list(items)
         start, end = timestamp.split('-->')
-        start = start.strip()
-        end = end.strip()
-        texts.append(Segment(timestamp=timestamp, start=start, end=end, text=text))
+        texts.append(Segment(timestamp=timestamp, start=get_seconds(start), end=get_seconds(end), text=text))
     return texts
 
 

@@ -36,6 +36,25 @@ choco install ffmpeg
 scoop install ffmpeg
 ```
 
+## Streamlit-based Web UI
+
+Our project's Web UI, powered by Streamlit, allows users to add subtitles to videos through an intuitive web interface. This section outlines the primary features of this functionality:
+
+1. **Configurable Options**: Users can specify multiple settings such as the Whisper model for audio processing, language preferences, video file types, and subtitle styles to suit various requirements.
+2. **Automatic Subtitle Generation**: The tool supports generating subtitles directly from the video content, leveraging advanced speech-to-text technology for accuracy.
+3. **Subtitle Preview Mode**: After adding subtitles, users can engage a preview mode to see how subtitles appear on the actual video, ensuring proper synchronization and styling.
+4. **Editable Subtitles with Auto Save**: This feature allows users to edit subtitles and see changes in real-time. The 'Auto Save' option can be toggled to apply modifications instantly.
+5. **Subtitle File Download**: Once subtitles are created or edited, users have the option to download these files in different formats (e.g., SRT, VTT), making them compatible with various media players and platforms.
+6. **Export Video with Subtitles**: Users can export the final video with subtitles embedded, ready for sharing on different platforms or for personal use.
+
+Launching the Web UI:
+
+```bash
+poetry run streamlit run webui.py
+```
+
+And, open your web browser and enter the following address to access the Web UI: `http://localhost:8501/`
+
 ## Command-line usage
 
 There are two primary command-line usage types:

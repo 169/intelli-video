@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import yt_dlp
 from loguru import logger
@@ -6,10 +7,13 @@ from loguru import logger
 from config import DOWNLOAD_DIR
 from core.schema import DownloadMedia
 
+if isinstance(DOWNLOAD_DIR, Path):
+    DOWNLOAD_DIR = DOWNLOAD_DIR.as_posix()
+
 ydl_opts = {
     "quiet": True,
     "format": "bv+ba/b",
-    "paths": {"home": DOWNLOAD_DIR.as_posix()},
+    "paths": {"home": DOWNLOAD_DIR},
     "keepvideo": True,
     "postprocessors": [
         {
