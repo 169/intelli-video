@@ -86,7 +86,10 @@ def parse_vtt(text: str) -> list[Segment]:
             timestamp, text, _ = list(items)
         except ValueError:
             timestamp, text = list(items)
-        texts.append(Segment(timestamp=timestamp, text=text))
+        start, end = timestamp.split('-->')
+        start = start.strip()
+        end = end.strip()
+        texts.append(Segment(timestamp=timestamp, start=start, end=end, text=text))
     return texts
 
 

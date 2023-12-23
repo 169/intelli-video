@@ -12,7 +12,7 @@ class DownloadMedia(BaseModel):
 class Segment(BaseModel):
     text: str
     timestamp: Optional[str]
-    start: Optional[float | None] = None
-    end: Optional[float | None] = None
+    start: Optional[str | None] = None
+    end: Optional[str | None] = None
     title: Optional[str | None] = None
     subtitle: Optional[str | None] = None

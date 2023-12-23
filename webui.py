@@ -24,8 +24,10 @@ from core.video import generate_video
 if "subtitle_path" not in st.session_state:
     st.session_state.update(
         {
+            "current_time": '',
             "vtt_content": "",
             "subtitle_path": "",
+            "widget_values": {},
             "video": {
                 "mimetype": "video/mp4",
                 "path": "",
@@ -33,6 +35,14 @@ if "subtitle_path" not in st.session_state:
             },
         }
     )
+
+
+def make_recording_widget(f):
+    def wrapper(label, *args, **kwargs):
+        widget_value = f(*args, **kwargs)
+        st.session_state.widget_values[label] = widget_value
+        return widget_value
+    return wrapper
 
 with st.sidebar:
     st.info("🎈 Configure")
@@ -134,6 +144,7 @@ def preview_callback() -> None:
             path=video_path,
             mimetype="video/mp4",
             track=track,
+            current_time="",
         )
 
 def generate_callback() -> None:
@@ -148,6 +159,8 @@ def generate_callback() -> None:
 
 
 col1, col2, col3, col4, col5 = st.columns(5)
+
+st.write(st.session_state["current_time"])
 
 with col1:
     st.button("Preview", on_click=preview_callback)
@@ -172,8 +185,12 @@ with col4:
 with col5:
     st.button("Generate", on_click=generate_callback)
 
-streamlit_component_video(
+make_recording_widget(streamlit_component_video)(
+    label="video_component",
     video=st.session_state["video"]["path"],
     mimetype=st.session_state["video"]["mimetype"],
     track=st.session_state["video"]["track"],
+    current_time=st.session_state["current_time"],
 )
+
+st.write(st.session_state["widget_values"])
