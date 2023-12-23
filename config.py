@@ -2,8 +2,8 @@ from pathlib import Path
 
 DEBUG = False
 HERE = Path(__file__).parent.absolute()
-DOWNLOAD_DIR = HERE / ".download"
-OUTPUT_DIR = HERE / "output"
+DOWNLOAD_DIR: str | Path = HERE / ".download"
+OUTPUT_DIR: str | Path = HERE / "output"
 WHISPER_MODEL = "small"
 FFMPEG_BIN = "ffmpeg"
 FFMPEG_PREFIX_OPTS = "-hide_banner -loglevel error -y"

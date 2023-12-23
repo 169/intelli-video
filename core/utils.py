@@ -24,7 +24,9 @@ def format_timestamp(
     return f"{minutes:02d}:{seconds:02d}.{milliseconds:03d}"
 
 
-def write_vtt(transcript: list[dict|Segment], audio: str, language: str | None = None) -> str:
+def write_vtt(
+    transcript: list[dict | Segment], audio: str, language: str | None = None
+) -> str:
     if language is not None:
         vtt_filename = f"{audio.removesuffix('.mp3')}.{language}.vtt"
     else:
@@ -32,13 +34,13 @@ def write_vtt(transcript: list[dict|Segment], audio: str, language: str | None =
     return _write_vtt(transcript, vtt_filename)
 
 
-def _write_vtt(transcript: list[dict|Segment], vtt_filename: str) -> str:
-
+def _write_vtt(transcript: list[dict | Segment], vtt_filename: str) -> str:
     with open(vtt_filename, "w") as f:
         f.write("WEBVTT\n")
         for segment in transcript:
             if isinstance(segment, Segment):
                 segment = segment.model_dump()
+            print(segment, "segment")
             start = format_timestamp(segment["start"])
             end = format_timestamp(segment["end"])
             f.write(f"\n{start} --> {end}\n{segment['text'].strip()}\n")
@@ -100,8 +102,15 @@ def parse_vtt(text: str) -> list[Segment]:
             timestamp, text, _ = list(items)
         except ValueError:
             timestamp, text = list(items)
-        start, end = timestamp.split('-->')
-        texts.append(Segment(timestamp=timestamp, start=get_seconds(start), end=get_seconds(end), text=text))
+        start, end = timestamp.split("-->")
+        texts.append(
+            Segment(
+                timestamp=timestamp,
+                start=get_seconds(start),
+                end=get_seconds(end),
+                text=text,
+            )
+        )
     return texts
 
 
