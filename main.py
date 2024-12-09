@@ -113,7 +113,7 @@ def subtitle(path, output, language, model, method, format):
 @click.option(
     "-s",
     "--subtitles",
-    default="zh,en",
+    default="",
     cls=Mutex,
     not_required_if=["bilingual"],
     help='Subtitle languages. split by ","',

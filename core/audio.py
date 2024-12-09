@@ -10,11 +10,13 @@ from loguru import logger
 from whisper.utils import get_writer
 
 from config import (
+    DEBUG,
     DOWNLOAD_DIR,
     FFMPEG_BIN,
     FFMPEG_PREFIX_OPTS,
     TEXT_LIMIT,
     WHISPER_MODEL,
+    INITIAL_PROMPT_MAP,
 )
 from core.client import Client
 from core.prompts import render_translate_prompt
@@ -34,7 +36,8 @@ def transcribe(
     warnings.filterwarnings("ignore")
     logger.info(f"Transcribe: {audio} <Language: {language}>")
     model = whisper.load_model(model_name)
-    result = model.transcribe(audio, language=language)
+    result = model.transcribe(audio, language=language, verbose=DEBUG,
+                              initial_prompt=INITIAL_PROMPT_MAP.get(language, None))
     logger.info(f"Transcribed: {audio} <Language: {language}>")
     warnings.filterwarnings("default")
     return result

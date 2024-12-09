@@ -40,7 +40,6 @@ def _write_vtt(transcript: list[dict | Segment], vtt_filename: str) -> str:
         for segment in transcript:
             if isinstance(segment, Segment):
                 segment = segment.model_dump()
-            print(segment, "segment")
             start = format_timestamp(segment["start"])
             end = format_timestamp(segment["end"])
             f.write(f"\n{start} --> {end}\n{segment['text'].strip()}\n")

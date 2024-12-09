@@ -222,4 +222,6 @@ make_recording_widget(streamlit_component_video)(
 
 current_vtt = st.text_input("Subtitle", value=get_current_vtt_content())
 if st.session_state.segments and current_vtt:
-    st.session_state.replaced_segments[st.session_state.current_seg_index].text = current_vtt
+    st.session_state.replaced_segments[
+        st.session_state.current_seg_index
+    ].text = current_vtt
