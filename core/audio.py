@@ -171,11 +171,14 @@ def generate_audio(video: str | Path, suffix=".mp3") -> str:
     if not isinstance(video, Path):
         video = Path(video)
 
-    audio = f"{DOWNLOAD_DIR}/{video.parts[-1].removesuffix(video.suffix)}{suffix}"
+    audio_output_path = DOWNLOAD_DIR / f"{video.stem}{suffix}"
+    audio_output_path = audio_output_path.as_posix()  # Use posix path to normalize path separators
 
-    subprocess.check_call(
-        f"{FFMPEG_BIN} {FFMPEG_PREFIX_OPTS} -i '{video.as_posix()}' -b:a 192K -vn '{audio}'",
-        shell=True,
-    )
-    logger.info(f"Audio generated: {audio}")
-    return audio
+    command = f'{FFMPEG_BIN} {FFMPEG_PREFIX_OPTS} -i "{video.as_posix()}" -b:a 192K -vn "{audio_output_path}"'
+
+    logger.info(f"Executing command: {command}")
+    subprocess.check_call(command, shell=True)
+
+    logger.info(f"Audio generated: {audio_output_path}")
+    return str(audio_output_path)
+
